@@ -14,12 +14,13 @@ declare global {
 const Dashboard = () => {
   useEffect(() => {
     const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+    const myMidtransClientKey = process.env.CLIENT_KEY as string;
 
     let scriptTag = document.createElement("script");
+    
     scriptTag.src = midtransScriptUrl;
-
-    const myMidtransClientKey = process.env.CLIENT_KEY as string;
     scriptTag.setAttribute("data-client-key", myMidtransClientKey);
+    scriptTag.async = true
 
     document.body.appendChild(scriptTag);
 
