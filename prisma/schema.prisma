@@ -13,13 +13,57 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model User {
-  id         Int      @id @unique() @default(autoincrement())
-  name       String
-  isAdmin    Boolean  @default(false)
-  email      String
-  telegramId String   @unique
-  password   String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String        @id @default(cuid())
+  name          String
+  isAdmin       Boolean       @default(false)
+  email         String
+  telegramId    String        @unique
+  password      String
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  sessions      Session[]
+  transactions  Transaction[]
+}
+
+model Membership {
+  id           String        @id @default(cuid())
+  duration     Int
+  price        BigInt
+  description  String?
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Transaction {
+  id                String             @id @default(cuid())
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId            String
+  membership        Membership         @relation(fields: [membershipId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  membershipId      String
+  transactionDetail TransactionDetail?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+model TransactionDetail {
+  id            String      @id @default(cuid())
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  transactionId String      @unique
+  telegramId    String
+  price         BigInt
+  expireAt      DateTime
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }

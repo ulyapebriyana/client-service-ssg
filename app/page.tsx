@@ -1,6 +1,7 @@
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import Feature from "@/components/feature";
 
 export default async function Home() {
   const session = await auth()
@@ -8,7 +9,7 @@ export default async function Home() {
   
   return (
     <main className="flex items-center justify-center w-full h-[90vh]">
-      <div className="text-3xl">Aplikasi masih dalam tahap pengembangan</div>
+      <Feature />
     </main>
   );
 }

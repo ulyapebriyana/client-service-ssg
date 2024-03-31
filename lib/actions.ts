@@ -3,9 +3,72 @@
 import { registerSchema } from "@/schema"
 import { z } from "zod"
 import { redirect } from 'next/navigation';
+import prisma from "./db";
+import moment from "moment"
+import { auth } from "./auth";
 
-export const signInResponse = async(response: any) => {
-    console.log(response);
+export const createTransactionDetails = async (formData: FormData) => {
+    const session = await auth()
+    if (!session) {
+        return redirect("/sign-in")
+    }
+    const rawFormData = Object.fromEntries(formData)
+    const { userId, telegramId, membershipId, price, memberDuration } = rawFormData
+    const expireAt = moment().add(Number(memberDuration), "months")
+
+    const existedPeriod = await prisma.transactionDetail.findFirst({
+        where: {
+            telegramId: telegramId as string,
+            expireAt: {
+                gte: moment().format()
+            }
+        },
+        orderBy: {
+            expireAt: "desc"
+        }
+    })
+
+    if (!existedPeriod) {
+        const sendInvitation = await fetch(`${process.env.ROUTE_ORIGIN}/api/sendInvitation`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                telegramId: telegramId
+            })
+        })
+
+        const response = await sendInvitation.json()
+
+        console.log(response);
+    }
+
+    const remainPeriod = existedPeriod?.expireAt
+
+    let newExpireAt = moment(expireAt); // Buat salinan expireAt
+
+    if (remainPeriod) {
+        const diff = moment(remainPeriod).diff(moment(), 'milliseconds'); // Hitung selisih waktu dalam milidetik
+        newExpireAt.add(diff); // Tambahkan selisih waktu ke expireAt
+    }
+
+    const transaction = await prisma.transaction.create({
+        data: {
+            userId: userId as string,
+            membershipId: membershipId as string,
+            transactionDetail: {
+                create: {
+                    telegramId: telegramId as string,
+                    price: BigInt(price as string),
+                    expireAt: newExpireAt.format()
+                }
+            }
+        }
+    })
+    console.log(transaction);
+
+
 }
 
 export const signUp = async (prevState: any, values: z.infer<typeof registerSchema>) => {
@@ -28,9 +91,6 @@ export const signUp = async (prevState: any, values: z.infer<typeof registerSche
 
     const res = await req.json()
 
-    console.log(res);
-
-
     if (res.status === 400) {
         return {
             message: "Telegram Id tidak ditemukan, hubungi chatbot kami!"
@@ -40,7 +100,7 @@ export const signUp = async (prevState: any, values: z.infer<typeof registerSche
             message: "Telegram Id sudah terdaftar, silahkan login kembali"
         }
     } else if (res.status === 201) {
-        return redirect("/")
+        return redirect("/sign-in")
     } else {
         return {
             message: "Server internal kami sedang error"
