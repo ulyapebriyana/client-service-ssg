@@ -57,6 +57,24 @@ export async function POST(request: Request, response: Response) {
         } else if (transactionStatus == 'settlement') {
             // TODO set transaction status on your database to 'success'
             // and response with 200 OK
+            const transactionUpdated = await prisma.transaction.update({
+                where: {
+                    id: transactionId
+                },
+                data: {
+                    status: "SUCCESS"
+                }
+            })
+
+            const newMember = await prisma.memberDetail.create({
+                data: {
+                    transactionId: transactionId,
+                    telegramId: telegramId as string,
+                    expireAt: moment().add(duration, "M").format()
+
+                }
+            })
+
         } else if (transactionStatus == 'cancel' ||
             transactionStatus == 'deny' ||
             transactionStatus == 'expire') {
