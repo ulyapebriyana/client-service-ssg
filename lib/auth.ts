@@ -56,6 +56,7 @@ export const config = {
         return {
           ...token,
           userId: user.id,
+          isAdmin: user.isAdmin,
           telegramId: user.telegramId
         }
       }
@@ -69,6 +70,7 @@ export const config = {
         user: {
           ...session.user,
           userId: token.userId,
+          isAdmin: token.isAdmin,
           telegramId: token.telegramId
         }
       }

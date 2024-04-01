@@ -1,12 +1,17 @@
-import React from 'react'
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-const Dashboard = () => {
-  return (
-    <div>Dashboard bang</div>
-  )
-}
+const AdminDashboard = async () => {
+  const session = await auth();
 
-export default Dashboard
+  if (!session?.user.isAdmin) {
+    return redirect("/")
+  }
+  
+  return <div>AdminDashboard bang</div>;
+};
+
+export default AdminDashboard;
 
 // "use client";
 
@@ -27,7 +32,7 @@ export default Dashboard
 //     const myMidtransClientKey = process.env.CLIENT_KEY as string;
 
 //     let scriptTag = document.createElement("script");
-    
+
 //     scriptTag.src = midtransScriptUrl;
 //     scriptTag.setAttribute("data-client-key", myMidtransClientKey);
 //     scriptTag.async = true
