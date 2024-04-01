@@ -5,7 +5,7 @@ import prisma from "@/lib/db";
 export async function GET() {
     try {
         const currentDate = new Date()
-        const members = await prisma.transactionDetail.findMany({
+        const members = await prisma.memberDetail.findMany({
             where: {
                 expireAt: {
                     lte: currentDate
@@ -29,7 +29,7 @@ export async function GET() {
                 const sendMessageToAdmin = await bot.telegram.sendMessage(telegramIdAdmin, `User dengan telegramId ${userIdTelegram}, telah meninggalkan group`)
             }
 
-            const dataMember = await prisma.transactionDetail.update({
+            const dataMember = await prisma.memberDetail.update({
                 where: {
                     id: member.id
                 },
@@ -39,15 +39,15 @@ export async function GET() {
             })
         }))
 
-        const serializedMembers = members.map(({ price, ...rest }) => ({
-            ...rest,
-            price: price.toString(),
-        }));
+        // const serializedMembers = members.map(({ price, ...rest }) => ({
+        //     ...rest,
+        //     price: price.toString(),
+        // }));
 
         return NextResponse.json({
             status: 200,
             message: "get experied period success",
-            data: serializedMembers
+            data: members
         })
 
     } catch (error) {

@@ -9,75 +9,75 @@ import { auth } from "./auth";
 
 
 
-export const createTransactionDetails = async (formData: FormData) => {
-    const session = await auth()
-    if (!session) {
-        return redirect("/sign-in")
-    }
-    const rawFormData = Object.fromEntries(formData)
-    const { userId, telegramId, membershipId, price, memberDuration } = rawFormData
-    const expireAt = moment().add(Number(memberDuration), "months")
+// export const createTransactionDetails = async (formData: FormData) => {
+//     const session = await auth()
+//     if (!session) {
+//         return redirect("/sign-in")
+//     }
+//     const rawFormData = Object.fromEntries(formData)
+//     const { userId, telegramId, membershipId, price, memberDuration } = rawFormData
+//     const expireAt = moment().add(Number(memberDuration), "months")
 
-    const existedPeriod = await prisma.transactionDetail.findFirst({
-        where: {
-            telegramId: telegramId as string,
-            expireAt: {
-                gte: moment().format()
-            }
-        },
-        orderBy: {
-            expireAt: "desc"
-        }
-    })
+//     const existedPeriod = await prisma.transactionDetail.findFirst({
+//         where: {
+//             telegramId: telegramId as string,
+//             expireAt: {
+//                 gte: moment().format()
+//             }
+//         },
+//         orderBy: {
+//             expireAt: "desc"
+//         }
+//     })
 
-    if (!existedPeriod) {
-        const sendInvitation = await fetch(`${process.env.ROUTE_ORIGIN}/api/sendInvitation`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                telegramId: telegramId
-            })
-        })
+//     if (!existedPeriod) {
+//         const sendInvitation = await fetch(`${process.env.ROUTE_ORIGIN}/api/sendInvitation`, {
+//             method: "POST",
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({
+//                 telegramId: telegramId
+//             })
+//         })
 
-        const response = await sendInvitation.json()
+//         const response = await sendInvitation.json()
 
-        console.log(response);
-    } else {
-        const deActive = await prisma.transactionDetail.updateMany({
-            where: {
-                telegramId: telegramId as string
-            },
-            data: {
-                isActive: false
-            },
-        })
-    }
+//         console.log(response);
+//     } else {
+//         const deActive = await prisma.transactionDetail.updateMany({
+//             where: {
+//                 telegramId: telegramId as string
+//             },
+//             data: {
+//                 isActive: false
+//             },
+//         })
+//     }
 
-    const remainPeriod = existedPeriod?.expireAt
+//     const remainPeriod = existedPeriod?.expireAt
 
-    let newExpireAt = moment(expireAt); // Buat salinan expireAt
+//     let newExpireAt = moment(expireAt); // Buat salinan expireAt
 
-    if (remainPeriod) {
-        const diff = moment(remainPeriod).diff(moment(), 'milliseconds'); // Hitung selisih waktu dalam milidetik
-        newExpireAt.add(diff); // Tambahkan selisih waktu ke expireAt
-    }
+//     if (remainPeriod) {
+//         const diff = moment(remainPeriod).diff(moment(), 'milliseconds'); // Hitung selisih waktu dalam milidetik
+//         newExpireAt.add(diff); // Tambahkan selisih waktu ke expireAt
+//     }
 
-    const transaction = await prisma.transaction.create({
-        data: {
-            userId: userId as string,
-            membershipId: membershipId as string,
-            transactionDetail: {
-                create: {
-                    telegramId: telegramId as string,
-                    price: BigInt(price as string),
-                    expireAt: newExpireAt.format()
-                }
-            }
-        }
-    })
-}
+//     const transaction = await prisma.transaction.create({
+//         data: {
+//             userId: userId as string,
+//             membershipId: membershipId as string,
+//             transactionDetail: {
+//                 create: {
+//                     telegramId: telegramId as string,
+//                     price: BigInt(price as string),
+//                     expireAt: newExpireAt.format()
+//                 }
+//             }
+//         }
+//     })
+// }
 
 export const signUp = async (prevState: any, values: z.infer<typeof registerSchema>) => {
     const { name, email, telegramId, password, passwordConfirmation } = values

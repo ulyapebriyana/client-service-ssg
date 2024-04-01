@@ -36,7 +36,7 @@ model User {
   transactions  Transaction[]
 }
 
-model Membership {
+model MembershipPlanning {
   id           String        @id @default(cuid())
   duration     Int
   price        BigInt
@@ -47,24 +47,33 @@ model Membership {
 }
 
 model Transaction {
-  id                String             @id @default(cuid())
-  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId            String
-  membership        Membership         @relation(fields: [membershipId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  membershipId      String
-  transactionDetail TransactionDetail?
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  id                   String             @id @default(cuid())
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId               String
+  membershipPlanning   MembershipPlanning @relation(fields: [membershipPlanningId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  membershipPlanningId String
+  memberDetail         MemberDetail?
+  price                BigInt
+  snapToken            String?
+  snapRedirectUrl      String?
+  status               Status             @default(PENDING)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 }
 
-model TransactionDetail {
+model MemberDetail {
   id            String      @id @default(cuid())
   transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   transactionId String      @unique
   telegramId    String
-  price         BigInt
-  isActive      Boolean     @default(true)
   expireAt      DateTime
+  isActive      Boolean     @default(true)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+enum Status {
+  PENDING
+  SUCCESS
+  CANCEL
 }

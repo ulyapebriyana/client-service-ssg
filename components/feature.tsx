@@ -9,7 +9,7 @@ import {
 } from "./ui/card";
 import { Button } from "./ui/button";
 import { auth } from "@/lib/auth";
-import { createTransactionDetails } from "@/lib/actions";
+// import { createTransactionDetails } from "@/lib/actions";
 import { GetStartedButton } from "./buttons";
 import Payment from "./payment";
 
@@ -23,7 +23,7 @@ function formatToRupiah(amount: any) {
 const Feature = async () => {
   const session = await auth();
 
-  const memberships = await prisma.membership.findMany({
+  const memberships = await prisma.membershipPlanning.findMany({
     orderBy: {
       duration: "asc",
     },
@@ -32,12 +32,12 @@ const Feature = async () => {
   return (
     <section>
       <div className="flex gap-10">
-        {memberships.map((membership) => (
-          <Card key={membership.id} className="w-[350px]">
+        {memberships.map((planning) => (
+          <Card key={planning.id} className="w-[350px]">
             <CardHeader>
-              <CardTitle>{membership.duration} Bulan</CardTitle>
+              <CardTitle>{planning.duration} Bulan</CardTitle>
               <CardDescription>
-                {formatToRupiah(membership.price)}
+                {formatToRupiah(planning.price)}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -49,10 +49,10 @@ const Feature = async () => {
             <CardFooter>
               {/* <TestGetstarted /> */}
               <Payment
-                memberDuration={membership.duration}
-                membershipId={membership.id}
+                memberDuration={planning.duration}
+                membershipPlanningId={planning.id}
                 telegramId={session?.user.telegramId as string}
-                price={Number(membership.price)}
+                price={Number(planning.price)}
                 userId={session?.user.userId as string}
                 email={session?.user.email as string}
               />

@@ -1,7 +1,7 @@
 import prisma from "../lib/db"
 
 async function main() {
-    const month1 = await prisma.membership.create({
+    const month1 = await prisma.membershipPlanning.create({
         data: {
             duration: 12,
             price: 1000000,

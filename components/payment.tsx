@@ -15,7 +15,7 @@ interface Props {
   userId: string;
   telegramId: string;
   price: number;
-  membershipId: string;
+  membershipPlanningId: string;
   memberDuration: number;
   email: string;
 }
@@ -24,7 +24,7 @@ const Payment = ({
   userId,
   telegramId,
   price,
-  membershipId,
+  membershipPlanningId,
   memberDuration,
   email
 }: Props) => {
@@ -65,7 +65,7 @@ const Payment = ({
             userId: userId,
             telegramId: telegramId,
             price: price,
-            membershipId: membershipId,
+            membershipPlanningId: membershipPlanningId,
             memberDuration: memberDuration,
             email: email
           }),
