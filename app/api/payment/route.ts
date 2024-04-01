@@ -85,6 +85,9 @@ export async function POST(req: Request) {
                     order_id: transaction.id,
                     gross_amount: Number(transaction.transactionDetail?.price)
                 },
+                customer_details: {
+                    email: email
+                }
             })
         })
         const data = await requestToken.json()
