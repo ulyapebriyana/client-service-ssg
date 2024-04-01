@@ -42,6 +42,15 @@ export const createTransactionDetails = async (formData: FormData) => {
         const response = await sendInvitation.json()
 
         console.log(response);
+    } else {
+        const deActive = await prisma.transactionDetail.updateMany({
+            where: {
+                telegramId: telegramId as string
+            },
+            data: {
+                isActive: false
+            },
+        })
     }
 
     const remainPeriod = existedPeriod?.expireAt

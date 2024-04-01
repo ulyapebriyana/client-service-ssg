@@ -63,6 +63,7 @@ model TransactionDetail {
   transactionId String      @unique
   telegramId    String
   price         BigInt
+  isActive      Boolean     @default(true)
   expireAt      DateTime
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
