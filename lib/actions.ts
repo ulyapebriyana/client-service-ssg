@@ -1,13 +1,44 @@
 "use server"
 
-import { forgotPasswordSchema, registerSchema } from "@/schema"
+import { forgotPasswordSchema, registerSchema, resetPasswordSchema } from "@/schema"
 import { z } from "zod"
 import { redirect } from 'next/navigation';
 import prisma from "./db";
-import jwt from "jsonwebtoken"
+import jwt, { JwtPayload } from "jsonwebtoken"
 import moment from "moment"
 import { auth } from "./auth";
 import bot from "./bot";
+import bcrypt from "bcrypt"
+
+export const resetPassword = async (prevState: any, values: any) => {
+    const { password, passwordConfirmation, token } = values
+
+    try {
+        const { telegramId } = jwt.verify(token, process.env.FORGOT_PASSWORD_SECRET!) as JwtPayload;
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        const updatePassword = await prisma.user.update({
+            where: {
+                telegramId: telegramId
+            },
+            data: {
+                password: hashedPassword
+            }
+        })
+
+        await bot.telegram.sendMessage(telegramId, "Password akun anda berhasil diubah!")
+        
+        return {
+            success: true,
+            message: "Password Berhasil diubah"
+        }
+    } catch (err) {
+        return {
+            success: false,
+            message: "Telegram Id salah atau tidak ditemukan"
+        }
+    }
+}
 
 export const forgotPassword = async (prevState: any, values: z.infer<typeof forgotPasswordSchema>) => {
     const { telegramId } = values
@@ -31,6 +62,7 @@ export const forgotPassword = async (prevState: any, values: z.infer<typeof forg
 
     const sendMessage = await bot.telegram.sendMessage(telegramId, messageTelegram, { parse_mode: 'HTML' })
 
+    console.log(messageTelegram);
 
     return {
         success: true,

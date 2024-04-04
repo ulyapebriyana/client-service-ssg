@@ -21,3 +21,13 @@ export const loginSchema = z.object({
 export const forgotPasswordSchema = z.object({
     telegramId: z.string().min(4, "Minimal 4 karakter").max(15, "Maksimal 15 karakter"),
 })
+
+export const resetPasswordSchema = z.object({
+    password: z.string().min(6).max(10),
+    passwordConfirmation: z.string().min(6).max(10)
+}).refine((values) => {
+    return values.password === values.passwordConfirmation
+}, {
+    message: "Password dan konfirmasi password harus sesuai",
+    path: ["passwordConfirmation"]
+})
