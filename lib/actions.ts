@@ -1,12 +1,80 @@
 "use server"
 
-import { registerSchema } from "@/schema"
+import { forgotPasswordSchema, registerSchema } from "@/schema"
 import { z } from "zod"
 import { redirect } from 'next/navigation';
 import prisma from "./db";
+import jwt from "jsonwebtoken"
 import moment from "moment"
 import { auth } from "./auth";
+import bot from "./bot";
 
+export const forgotPassword = async (prevState: any, values: z.infer<typeof forgotPasswordSchema>) => {
+    const { telegramId } = values
+
+    const existedTelegramId = await prisma.user.findUnique({
+        where: {
+            telegramId: telegramId
+        }
+    })
+
+    if (!existedTelegramId) return {
+        success: false,
+        message: "Telegram Id tidak ditemukan"
+    }
+
+    const encodedTelegramId = jwt.sign({ telegramId: telegramId }, process.env.FORGOT_PASSWORD_SECRET!, { expiresIn: '1h' })
+    const linkResetPassword = `<a href="${process.env.ROUTE_ORIGIN}/reset-password/${encodedTelegramId}">Click disini</a>`
+
+    const messageTelegram = `Berikut ini adalah tautan menuju reset password akun anda: ${linkResetPassword}`
+
+
+    const sendMessage = await bot.telegram.sendMessage(telegramId, messageTelegram, { parse_mode: 'HTML' })
+
+
+    return {
+        success: true,
+        message: "Link reset password berhasil dikirim!. Cek bot kami sekarang juga!"
+    }
+
+}
+
+export const signUp = async (prevState: any, values: z.infer<typeof registerSchema>) => {
+    const { name, email, telegramId, password, passwordConfirmation } = values
+
+
+    const req = await fetch(`${process.env.ROUTE_ORIGIN}/api/auth/sign-up`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: name,
+            email: email,
+            telegramId: telegramId,
+            password: password,
+            passwordConfirmation: passwordConfirmation
+        })
+    })
+
+    const res = await req.json()
+
+    if (res.status === 400) {
+        return {
+            message: "Telegram Id tidak ditemukan, hubungi chatbot kami!"
+        }
+    } else if (res.status === 422) {
+        return {
+            message: "Telegram Id sudah terdaftar, silahkan login kembali"
+        }
+    } else if (res.status === 201) {
+        return redirect("/sign-in")
+    } else {
+        return {
+            message: "Server internal kami sedang error"
+        }
+    }
+}
 
 
 // export const createTransactionDetails = async (formData: FormData) => {
@@ -78,40 +146,3 @@ import { auth } from "./auth";
 //         }
 //     })
 // }
-
-export const signUp = async (prevState: any, values: z.infer<typeof registerSchema>) => {
-    const { name, email, telegramId, password, passwordConfirmation } = values
-
-
-    const req = await fetch(`${process.env.ROUTE_ORIGIN}/api/auth/sign-up`, {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            name: name,
-            email: email,
-            telegramId: telegramId,
-            password: password,
-            passwordConfirmation: passwordConfirmation
-        })
-    })
-
-    const res = await req.json()
-
-    if (res.status === 400) {
-        return {
-            message: "Telegram Id tidak ditemukan, hubungi chatbot kami!"
-        }
-    } else if (res.status === 422) {
-        return {
-            message: "Telegram Id sudah terdaftar, silahkan login kembali"
-        }
-    } else if (res.status === 201) {
-        return redirect("/sign-in")
-    } else {
-        return {
-            message: "Server internal kami sedang error"
-        }
-    }
-}

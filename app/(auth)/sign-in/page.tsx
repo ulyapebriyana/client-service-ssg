@@ -1,6 +1,8 @@
+
 import SignInForm from "@/components/sign-in-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 const SignIn = async () => {
@@ -15,6 +17,11 @@ const SignIn = async () => {
         <CardContent>
           <SignInForm />
         </CardContent>
+        <CardFooter>
+          <CardDescription>
+            <Link href={"/forgot-password"}>Forgot your password?</Link>
+          </CardDescription>
+        </CardFooter>
       </div>
     </section>
   );

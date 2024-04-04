@@ -17,3 +17,7 @@ export const loginSchema = z.object({
     telegramId: z.string().min(4, "Minimal 4 karakter").max(15, "Maksimal 15 karakter"),
     password: z.string().min(6, "Minimal 6 karakter").max(10, "Minimal 10 karakter"),
 })
+
+export const forgotPasswordSchema = z.object({
+    telegramId: z.string().min(4, "Minimal 4 karakter").max(15, "Maksimal 15 karakter"),
+})
