@@ -10,7 +10,8 @@ export async function POST(req: Request, res: Response) {
         const memberLimit = 1
         const createInvitation = await bot.telegram.createChatInviteLink(group_id, {
             expire_date: expiredDate,
-            member_limit: memberLimit
+            member_limit: memberLimit,
+            
         })
         const invitationLink = createInvitation.invite_link
         const sendInvitation = await bot.telegram.sendMessage(telegramId, invitationLink)

@@ -9,9 +9,17 @@ import {
 } from "./ui/card";
 import { Button } from "./ui/button";
 import { auth } from "@/lib/auth";
-// import { createTransactionDetails } from "@/lib/actions";
-import { GetStartedButton } from "./buttons";
 import Payment from "./payment";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 function formatToRupiah(amount: any) {
   return new Intl.NumberFormat("id-ID", {
@@ -47,7 +55,6 @@ const Feature = async () => {
               explicabo repudiandae in delectus quos natus!
             </CardContent>
             <CardFooter>
-              {/* <TestGetstarted /> */}
               <Payment
                 memberDuration={planning.duration}
                 membershipPlanningId={planning.id}

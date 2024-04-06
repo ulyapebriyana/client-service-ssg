@@ -1,9 +1,19 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useEffect, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 declare global {
   interface Window {
@@ -26,11 +36,19 @@ const Payment = ({
   price,
   membershipPlanningId,
   memberDuration,
-  email
+  email,
 }: Props) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    // Mengawasi perubahan isPending
+    if (!isPending) {
+      setOpen(false); // Menutup dialog saat isPending menjadi false
+    }
+  }, [isPending]); // Memantau perubahan isPending
 
   useEffect(() => {
     const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -67,7 +85,7 @@ const Payment = ({
             price: price,
             membershipPlanningId: membershipPlanningId,
             memberDuration: memberDuration,
-            email: email
+            email: email,
           }),
         }
       );
@@ -80,16 +98,31 @@ const Payment = ({
   };
 
   return (
-    <div className="w-full">
-      <Button
-        onClick={handlePay}
-        variant={"destructive"}
-        className="w-full"
-        disabled={isPending}
-      >
-        {isPending ? "Loading..." : "Get Started"}
-      </Button>
-    </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="default" className="w-full">
+          Get Started
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>
+            Apakah anda yakin memilih paket {memberDuration} bulan?
+          </DialogTitle>
+          <DialogDescription>
+            Make changes to your profile here. Click save when done.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant={"secondary"}>Cancel</Button>
+          </DialogClose>
+          <Button onClick={handlePay} disabled={isPending}>
+            {isPending ? "Loading..." : "Continue"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
