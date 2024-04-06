@@ -105,15 +105,13 @@ const Payment = ({
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+        <DialogHeader className="flex flex-col gap-5">
           <DialogTitle>
             Apakah anda yakin memilih paket {memberDuration} bulan?
           </DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when done.
-          </DialogDescription>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
-        <DialogFooter>
+        <DialogFooter className="flex flex-col-reverse md:flex-row gap-5">
           <DialogClose asChild>
             <Button variant={"secondary"}>Cancel</Button>
           </DialogClose>

@@ -38,10 +38,14 @@ const Feature = async () => {
   });
 
   return (
-    <section className="h-full">
+    <section
+      className="h-full border-b pb-20 flex flex-col w-full justify-center items-center gap-20"
+      id="pricingPlans"
+    >
+      <h1 className="text-3xl font-bold md:text-5xl">Pricing Plan</h1>
       <div className="flex gap-10 flex-col md:flex-row">
         {memberships.map((planning) => (
-          <Card key={planning.id} className="w-[350px]">
+          <Card key={planning.id} className="w-[400px]">
             <CardHeader>
               <CardTitle>{planning.duration} Bulan</CardTitle>
               <CardDescription>
