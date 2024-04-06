@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import bot from "@/lib/bot";
 
 
 export async function POST(req: Request) {
     try {
         const { userId, telegramId, price, membershipPlanningId, memberDuration, email } = await req.json()
-        console.log(membershipPlanningId);
-        
+
 
         const token = btoa(`${process.env.SERVER_KEY}:`)
 
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
             }
         })
 
-        
+
         const requestToken = await fetch("https://app.sandbox.midtrans.com/snap/v1/transactions", {
             method: "POST",
             headers: {
@@ -36,6 +36,21 @@ export async function POST(req: Request) {
             })
         })
         const data = await requestToken.json()
+
+        const redirectUrl = data.redirect_url as string
+
+        const updateSnap = await prisma.transaction.update({
+            where: {
+                id: transaction.id,
+            },
+            data: {
+                snapRedirectUrl: redirectUrl
+            }
+        })
+        
+        const linkResetPassword = `<a href="${redirectUrl}">Click disini</a>`
+
+        await bot.telegram.sendMessage(telegramId, `Berikut ini adalah link pembayaran anda: ${linkResetPassword}`, { parse_mode: 'HTML' })
 
         return NextResponse.json({ data })
     } catch (error) {

@@ -38,8 +38,8 @@ const Feature = async () => {
   });
 
   return (
-    <section>
-      <div className="flex gap-10">
+    <section className="h-full">
+      <div className="flex gap-10 flex-col md:flex-row">
         {memberships.map((planning) => (
           <Card key={planning.id} className="w-[350px]">
             <CardHeader>
