@@ -13,6 +13,8 @@ export async function GET(req: Request, res: Response) {
             }, { status: 401 })
         }
 
+        await bot.telegram.sendMessage("5449821599", "Cron is running")
+
         const currentDate = moment().format()
         const members = await prisma.memberDetail.findMany({
             where: {
