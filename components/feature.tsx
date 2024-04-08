@@ -10,22 +10,13 @@ import {
 import { Button } from "./ui/button";
 import { auth } from "@/lib/auth";
 import Payment from "./payment";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Check } from "lucide-react";
 
-function formatToRupiah(amount: any) {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-  }).format(amount);
+function formatToShortCurrency(amount: any) {
+  if (amount >= 1000) {
+    return (amount / 1000).toFixed(0) + "k"; // Ribu
+  }
+  return amount.toString();
 }
 
 const Feature = async () => {
@@ -43,22 +34,44 @@ const Feature = async () => {
       id="pricingPlans"
     >
       <h1 className="text-3xl font-bold md:text-5xl">Pricing Plan</h1>
-      <div className="flex gap-10 flex-col md:flex-row">
+      <div className="flex gap-10 flex-col md:flex-row flex-wrap justify-center">
         {memberships.map((planning) => (
-          <Card key={planning.id} className="w-[400px]">
-            <CardHeader>
-              <CardTitle>{planning.duration} Bulan</CardTitle>
-              <CardDescription>
-                {formatToRupiah(planning.price)}
+          <Card key={planning.id} className="w-full max-w-sm ">
+            <CardHeader className="flex gap-5">
+              <CardTitle className="text-center text-2xl">
+                {planning.name}
+              </CardTitle>
+              <CardDescription className="text-center text-lg">
+                {planning.description}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum
-              cumque distinctio error sint ad culpa blanditiis tenetur
-              consectetur odio molestiae officiis, laudantium voluptatem fuga
-              explicabo repudiandae in delectus quos natus!
+            <CardContent className="flex flex-col gap-10">
+              <div className="text-center">
+                <span className="text-3xl font-bold">
+                  Rp. {formatToShortCurrency(Number(planning.price))}
+                </span>
+                <span>/{planning.duration} bulan</span>
+              </div>
+              <ul className="flex flex-col gap-4">
+                <li className="flex gap-2">
+                  <Check />
+                  <p>Layanan konsultasi setiap waktu</p>
+                </li>
+                <li className="flex gap-2">
+                  <Check />
+                  <p>Beragam menu setiap hari</p>
+                </li>
+                <li className="flex gap-2">
+                  <Check />
+                  <p>Live konsultasi pada ahir pekan</p>
+                </li>
+                <li className="flex gap-2">
+                  <Check />
+                  <p>E-book tentang investasi</p>
+                </li>
+              </ul>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-10">
               <Payment
                 memberDuration={planning.duration}
                 membershipPlanningId={planning.id}

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import bot from "@/lib/bot";
 import prisma from "@/lib/db";
+import moment from "moment";
 
 export async function GET() {
     try {
-        const currentDate = new Date()
+        const currentDate = moment().format()
         const members = await prisma.memberDetail.findMany({
             where: {
                 expireAt: {
@@ -29,12 +30,9 @@ export async function GET() {
                 const sendMessageToAdmin = await bot.telegram.sendMessage(telegramIdAdmin, `User dengan telegramId ${userIdTelegram}, telah meninggalkan group`)
             }
 
-            const dataMember = await prisma.memberDetail.update({
+            const dataMember = await prisma.memberDetail.delete({
                 where: {
                     id: member.id
-                },
-                data: {
-                    isActive: false
                 }
             })
         }))
