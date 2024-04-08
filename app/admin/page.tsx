@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Overview from "@/components/overview";
 import TransactionDetail from "@/components/transaction-detail";
+import MemberDetail from "@/components/member-detail";
 
 const AdminDashboard = async () => {
   const session = await auth();
@@ -18,9 +19,9 @@ const AdminDashboard = async () => {
           <TabsList className="grid max-w-md grid-cols-3" >
             <TabsTrigger value="overview" >Overview</TabsTrigger>
             <TabsTrigger value="transactionDetail">
-              Transaction Detail
+              Transaction
             </TabsTrigger>
-            <TabsTrigger value="memberDetail">Member Detail</TabsTrigger>
+            <TabsTrigger value="memberDetail">Member</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -32,7 +33,7 @@ const AdminDashboard = async () => {
           </TabsContent>
 
           <TabsContent value="memberDetail">
-            <TransactionDetail />
+            <MemberDetail />
           </TabsContent>
         </Tabs>
       </div>

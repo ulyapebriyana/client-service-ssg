@@ -103,11 +103,11 @@ export const getMember = async () => {
     })
 
     const differenceMember = members - lastMonthMembers;
-    const symbol = differenceMember >= 0 ? '+' : '-'; 
+    const symbol = differenceMember >= 0 ? '+' : '-';
 
     return {
         totalMembers: members,
-        differenceMember: `${symbol}${Math.abs(differenceMember)}` 
+        differenceMember: `${symbol}${Math.abs(differenceMember)}`
     };
 }
 
@@ -139,9 +139,9 @@ export const getTotalTransaction = async () => {
 
     const symbol = transactionDifference >= 0 ? '+' : '-';
 
-    return { 
-        totalTransactions: totalTransactions, 
-        percentChange: `${symbol}${Math.abs(percentChange).toFixed(2)}%` 
+    return {
+        totalTransactions: totalTransactions,
+        percentChange: `${symbol}${Math.abs(percentChange).toFixed(2)}%`
     };
 }
 
@@ -202,4 +202,54 @@ export const getRecentTransactions = async () => {
     }));
 
     return mappedTransactions;
+}
+
+export const getMemberDetail = async () => {
+    const members = await prisma.memberDetail.findMany({
+        where: {
+            isActive: true
+        },
+        select: {
+            id: true,
+            telegramId: true,
+            transactionId: true,
+            createdAt: true,
+            expireAt: true,
+            transaction: {
+                select: {
+                    user: {
+                        select: {
+                            name: true
+                        }
+                    }
+                }
+            }
+        }
+    })
+
+    const formattedMembers = members.map(member => {
+        return {
+            id: member.id,
+            telegramId: member.telegramId,
+            transactionId: member.transactionId,
+            createdAt: member.createdAt,
+            expireAt: member.expireAt,
+            name: member.transaction.user.name // Mengambil nama user dari transaction
+        };
+    });
+
+    return formattedMembers;
+}
+
+export const getAllTransactions = async () => {
+    const transactions = await prisma.transaction.findMany({
+        include: {
+            user: true
+        },
+        orderBy: {
+            updatedAt: "desc"
+        }
+    })
+
+    return transactions
 }

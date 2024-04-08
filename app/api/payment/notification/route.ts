@@ -31,6 +31,54 @@ export async function POST(request: Request, response: Response) {
         const telegramId = getUser?.user.telegramId
         const duration = getUser?.membershipPlanning.duration
 
+        const expireAt = moment().add(Number(duration), "months")
+
+        const existedPeriod = await prisma.memberDetail.findFirst({
+            where: {
+                telegramId: telegramId as string,
+                expireAt: {
+                    gte: moment().format()
+                }
+            },
+            orderBy: {
+                expireAt: "desc"
+            }
+        })
+
+        if (!existedPeriod) {
+            const sendInvitation = await fetch(`${process.env.ROUTE_ORIGIN}/api/sendInvitation`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    telegramId: telegramId
+                })
+            })
+
+            const response = await sendInvitation.json()
+
+            console.log(response);
+        } else {
+            const deActive = await prisma.memberDetail.updateMany({
+                where: {
+                    telegramId: telegramId as string
+                },
+                data: {
+                    isActive: false
+                },
+            })
+        }
+
+        const remainPeriod = existedPeriod?.expireAt
+
+        let newExpireAt = moment(expireAt); // Buat salinan expireAt
+
+        if (remainPeriod) {
+            const diff = moment(remainPeriod).diff(moment(), 'milliseconds'); // Hitung selisih waktu dalam milidetik
+            newExpireAt.add(diff); // Tambahkan selisih waktu ke expireAt
+        }
+
         if (transactionStatus == 'capture') {
             if (fraudStatus == 'accept') {
                 // TODO set transaction status on your database to 'success'
@@ -48,7 +96,7 @@ export async function POST(request: Request, response: Response) {
                     data: {
                         transactionId: transactionId,
                         telegramId: telegramId as string,
-                        expireAt: moment().add(duration, "M").format()
+                        expireAt: newExpireAt.format()
 
                     }
                 })
@@ -70,7 +118,7 @@ export async function POST(request: Request, response: Response) {
                 data: {
                     transactionId: transactionId,
                     telegramId: telegramId as string,
-                    expireAt: moment().add(duration, "M").format()
+                    expireAt: newExpireAt.format()
 
                 }
             })

@@ -23,9 +23,8 @@ import {
 } from "@/lib/admin-actions";
 
 const Overview = async () => {
-  const revenue = await getRevenue();
-  console.log(revenue);
   
+  const revenue = await getRevenue();
   const users = await getUsers();
   const members = await getMember();
   const transactions = await getTotalTransaction();
