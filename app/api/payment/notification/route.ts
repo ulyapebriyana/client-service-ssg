@@ -45,21 +45,7 @@ export async function POST(request: Request, response: Response) {
             }
         })
 
-        if (!existedPeriod) {
-            const sendInvitation = await fetch(`${process.env.ROUTE_ORIGIN}/api/sendInvitation`, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    telegramId: telegramId
-                })
-            })
-
-            const response = await sendInvitation.json()
-
-            console.log(response);
-        } else {
+        if (existedPeriod) {
             const deActive = await prisma.memberDetail.updateMany({
                 where: {
                     telegramId: telegramId as string
@@ -101,6 +87,22 @@ export async function POST(request: Request, response: Response) {
                     }
                 })
 
+                if (!existedPeriod) {
+                    const sendInvitation = await fetch(`${process.env.ROUTE_ORIGIN}/api/sendInvitation`, {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            telegramId: telegramId
+                        })
+                    })
+
+                    const response = await sendInvitation.json()
+
+                    console.log(response);
+                }
+
             }
         } else if (transactionStatus == 'settlement') {
             // TODO set transaction status on your database to 'success'
@@ -122,6 +124,22 @@ export async function POST(request: Request, response: Response) {
 
                 }
             })
+
+            if (!existedPeriod) {
+                const sendInvitation = await fetch(`${process.env.ROUTE_ORIGIN}/api/sendInvitation`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegramId: telegramId
+                    })
+                })
+
+                const response = await sendInvitation.json()
+
+                console.log(response);
+            }
 
         } else if (transactionStatus == 'cancel' ||
             transactionStatus == 'deny' ||
