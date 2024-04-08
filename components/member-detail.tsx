@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -8,16 +10,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getMemberDetail } from "@/lib/admin-actions";
 import moment from "moment";
+import ReactPaginate from "react-paginate";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const MemberDetail = async () => {
-  const members = await getMemberDetail();
+const MemberDetail = ({ data }: { data: any }) => {
+  const [page, setPage] = useState(0);
+  const [filterData, setFilterData] = useState<any[]>([]);
+
+  const n = 10;
+
+  useEffect(() => {
+    setFilterData(
+      data.filter((item: any, index: any) => {
+        return index >= page * n && index < (page + 1) * n;
+      })
+    );
+  }, [data, page]);
 
   return (
     <div className="rounded-md border">
       <Table>
-        <TableCaption>A list of your recent membership.</TableCaption>
         <TableHeader className="bg-muted/50">
           <TableRow>
             <TableHead className="">Name</TableHead>
@@ -27,25 +41,42 @@ const MemberDetail = async () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {members.map((member) => (
-            <TableRow key={member.id}>
-              <TableCell className="font-medium">
-                {member.name}
-              </TableCell>
-              <TableCell>{member.telegramId}</TableCell>
-              <TableCell>
-                {moment(member.createdAt).format("DD/MM/YYYY")}
-              </TableCell>
-              <TableCell className="text-right">
-                {moment(member.expireAt).format("DD/MM/YYYY")}
-              </TableCell>
-            </TableRow>
-          ))}
+          {filterData &&
+            filterData.map((member) => (
+              <TableRow key={member.id}>
+                <TableCell className="font-medium">{member.name}</TableCell>
+                <TableCell>{member.telegramId}</TableCell>
+                <TableCell>
+                  {moment(member.createdAt).format("DD/MM/YYYY")}
+                </TableCell>
+                <TableCell className="text-right">
+                  {moment(member.expireAt).format("DD/MM/YYYY")}
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={3}>Total</TableCell>
-            <TableCell className="text-right">$2,500.00</TableCell>
+            <TableCell colSpan={7}>
+              <ReactPaginate
+                containerClassName={"flex items-center justify-end mx-10"}
+                activeClassName={"text-red-500"}
+                pageClassName={"p-2 mx-2"}
+                onPageChange={(event) => setPage(event.selected)}
+                breakLabel="..."
+                pageCount={Math.ceil(data.length / n)}
+                previousLabel={
+                  <div className="border p-2">
+                    <ChevronLeft />
+                  </div>
+                }
+                nextLabel={
+                  <div className="border p-2">
+                    <ChevronRight />
+                  </div>
+                }
+              />
+            </TableCell>
           </TableRow>
         </TableFooter>
       </Table>

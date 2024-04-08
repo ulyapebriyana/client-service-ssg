@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Overview from "@/components/overview";
 import TransactionDetail from "@/components/transaction-detail";
 import MemberDetail from "@/components/member-detail";
+import { getAllTransactions, getMemberDetail } from "@/lib/admin-actions";
 
 const AdminDashboard = async () => {
   const session = await auth();
@@ -11,6 +12,9 @@ const AdminDashboard = async () => {
   if (!session?.user.isAdmin) {
     return redirect("/");
   }
+
+  const transactions = await getAllTransactions();
+  const members = await getMemberDetail();
 
   return (
     <section className="py-10 ">
@@ -29,11 +33,11 @@ const AdminDashboard = async () => {
           </TabsContent>
 
           <TabsContent value="transactionDetail">
-            <TransactionDetail />
+            <TransactionDetail data={transactions} />
           </TabsContent>
 
           <TabsContent value="memberDetail">
-            <MemberDetail />
+            <MemberDetail data={members} />
           </TabsContent>
         </Tabs>
       </div>

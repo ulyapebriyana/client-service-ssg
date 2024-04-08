@@ -1,5 +1,6 @@
 import prisma from "@/lib/db";
 import moment from "moment";
+import { revalidatePath } from "next/cache";
 
 const startOfMonth = moment().startOf("month").toISOString();
 const endOfMonth = moment().endOf("month").toISOString();
@@ -248,8 +249,10 @@ export const getAllTransactions = async () => {
         },
         orderBy: {
             updatedAt: "desc"
-        }
+        },
     })
+
+    revalidatePath("/admin")
 
     return transactions
 }
