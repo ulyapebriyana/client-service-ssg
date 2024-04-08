@@ -14,7 +14,14 @@ const Navbar = async () => {
           <Image src={Logo} alt="Logo.jpg" priority height={50} width={50} />
         </Link>
         {session ? (
-          <SignOutButton />
+          <div className="flex gap-4">
+            {(session.user.isAdmin as boolean) && (
+              <Link href={"/admin"} className={buttonVariants()}>
+                Admin
+              </Link>
+            )}
+            <SignOutButton />
+          </div>
         ) : (
           <div className="flex gap-5">
             <Link href={"/sign-in"} className={buttonVariants()}>
