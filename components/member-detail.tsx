@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   Table,
@@ -10,24 +10,88 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getMemberDetail } from "@/lib/admin-actions";
 import moment from "moment";
-import ReactPaginate from "react-paginate";
-import { ChevronRight, ChevronLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
+import useSWR from "swr";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const MemberDetail = ({ data }: { data: any }) => {
-  const [page, setPage] = useState(0);
-  const [filterData, setFilterData] = useState<any[]>([]);
+const fetcher = async (...args: Parameters<typeof fetch>) => {
+  const res = await fetch(...args);
+  return res.json();
+};
 
-  const n = 10;
+const MemberDetail =  () => {
 
-  useEffect(() => {
-    setFilterData(
-      data.filter((item: any, index: any) => {
-        return index >= page * n && index < (page + 1) * n;
-      })
-    );
-  }, [data, page]);
+  const [page, setPage] = useState(1);
+
+  const { data, error } = useSWR(
+    `${window.location.origin}/api/members?page=${page}`,
+    fetcher
+  );
+
+  const members = data?.data;
+  const totalPages = data?.metadata?.totalPages || 0;
+
+  const nextPage = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
+
+  const prevPage = () => {
+    setPage((prevPage) => prevPage - 1);
+  };
+
+  const goToPage = (pageNumber: any) => {
+    setPage(pageNumber);
+  };
+
+  const renderPageNumbers = () => {
+    const range = 2; // Jumlah halaman yang akan ditampilkan sebelum dan sesudah halaman saat ini
+    const currentPage = page;
+  
+    const start = Math.max(1, currentPage - range);
+    const end = Math.min(totalPages, currentPage + range);
+  
+    const pageNumbers = [];
+  
+    if (start > 1) {
+      pageNumbers.push(
+        <button key={1} onClick={() => goToPage(1)} className="text-lg p-2">
+          1
+        </button>
+      );
+  
+      if (start > 2) {
+        pageNumbers.push(
+          <span key="start-ellipsis" className="p-2">...</span>
+        );
+      }
+    }
+  
+    for (let i = start; i <= end; i++) {
+      pageNumbers.push(
+        <button key={i} onClick={() => goToPage(i)} disabled={i === page} className={`text-lg p-2 ${i === currentPage ? 'text-primary' : ''}`}>
+          {i}
+        </button>
+      );
+    }
+  
+    if (end < totalPages) {
+      if (end < totalPages - 1) {
+        pageNumbers.push(
+          <span key="end-ellipsis" className="p-2">...</span>
+        );
+      }
+  
+      pageNumbers.push(
+        <button key={totalPages} onClick={() => goToPage(totalPages)} className="text-lg p-2">
+          {totalPages}
+        </button>
+      );
+    }
+  
+    return pageNumbers;
+  };
 
   return (
     <div className="rounded-md border">
@@ -41,41 +105,43 @@ const MemberDetail = ({ data }: { data: any }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filterData &&
-            filterData.map((member) => (
-              <TableRow key={member.id}>
-                <TableCell className="font-medium">{member.name}</TableCell>
-                <TableCell>{member.telegramId}</TableCell>
-                <TableCell>
-                  {moment(member.createdAt).format("DD/MM/YYYY")}
-                </TableCell>
-                <TableCell className="text-right">
-                  {moment(member.expireAt).format("DD/MM/YYYY")}
-                </TableCell>
-              </TableRow>
-            ))}
+          {members?.map((member: any) => (
+            <TableRow key={member.id}>
+              <TableCell className="font-medium">
+                {member.name}
+              </TableCell>
+              <TableCell>{member.telegramId}</TableCell>
+              <TableCell>
+                {moment(member.createdAt).format("DD/MM/YYYY")}
+              </TableCell>
+              <TableCell className="text-right">
+                {moment(member.expireAt).format("DD/MM/YYYY")}
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
         <TableFooter>
-          <TableRow>
+        <TableRow className="text-end">
             <TableCell colSpan={7}>
-              <ReactPaginate
-                containerClassName={"flex items-center justify-end mx-10"}
-                activeClassName={"text-red-500"}
-                pageClassName={"p-2 mx-2"}
-                onPageChange={(event) => setPage(event.selected)}
-                breakLabel="..."
-                pageCount={Math.ceil(data.length / n)}
-                previousLabel={
-                  <div className="border p-2">
-                    <ChevronLeft />
-                  </div>
-                }
-                nextLabel={
-                  <div className="border p-2">
-                    <ChevronRight />
-                  </div>
-                }
-              />
+              <div className="flex items-center justify-center">
+                <button
+                  onClick={prevPage}
+                  disabled={data?.metadata?.currentPage < 2}
+                  className="border rounded-sm p-2"
+                >
+                  <ChevronLeft />
+                </button>
+                {renderPageNumbers()}
+                <button
+                  onClick={nextPage}
+                  disabled={
+                    data?.metadata?.currentPage > data?.metadata?.totalPages - 1
+                  }
+                  className="border rounded-sm p-2"
+                >
+                  <ChevronRight />
+                </button>
+              </div>
             </TableCell>
           </TableRow>
         </TableFooter>

@@ -93,7 +93,7 @@ const Payment = ({
       const data = await getToken.json();
       console.log(data);
 
-      window.snap.pay(data.data.token);
+      window.snap.pay(data?.data?.token);
     });
   };
 
