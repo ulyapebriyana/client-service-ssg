@@ -200,6 +200,14 @@ export async function POST(request: Request, response: Response) {
             transactionStatus == 'expire') {
             // TODO set transaction status on your database to 'failure'
             // and response with 200 OK
+            const transactionUpdated = await prisma.transaction.update({
+                where: {
+                    id: transactionId
+                },
+                data: {
+                    status: "CANCEL"
+                }
+            })
         } else if (transactionStatus == 'pending') {
             // TODO set transaction status on your database to 'pending' / waiting payment
             // and response with 200 OK
