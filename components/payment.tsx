@@ -49,7 +49,7 @@ const Payment = ({
       setOpen(false); // Menutup dialog saat isPending menjadi false
     }
   }, [isPending]); // Memantau perubahan isPending
-
+  // Redeploy
   useEffect(() => {
     const midtransScriptUrl = "https://app.midtrans.com/snap/snap.js";
     const myMidtransClientKey = process.env.CLIENT_KEY as string;
