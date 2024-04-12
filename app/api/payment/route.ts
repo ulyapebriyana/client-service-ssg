@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         })
 
 
-        const requestToken = await fetch("https://app.sandbox.midtrans.com/snap/v1/transactions", {
+        const requestToken = await fetch(`${process.env.PAYMENT_URL}/snap/v1/transactions`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

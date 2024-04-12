@@ -51,7 +51,7 @@ const Payment = ({
   }, [isPending]); // Memantau perubahan isPending
 
   useEffect(() => {
-    const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+    const midtransScriptUrl = "https://app.midtrans.com/snap/snap.js";
     const myMidtransClientKey = process.env.CLIENT_KEY as string;
 
     let scriptTag = document.createElement("script");
