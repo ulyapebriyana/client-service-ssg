@@ -20,6 +20,7 @@ import { signUp } from "@/lib/actions";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react"
 
 const initialState = {
   message: "",
@@ -122,7 +123,14 @@ const SignUpForm = () => {
           )}
         />
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? "Submitting..." : "Submit"}
+        {isPending ? (
+            <div className="flex flex-row items-center justify-center">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </div>
+          ) : (
+            "Submit"
+          )}
         </Button>
       </form>
     </Form>

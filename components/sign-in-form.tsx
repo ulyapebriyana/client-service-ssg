@@ -20,6 +20,7 @@ import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 const SignInForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -89,7 +90,14 @@ const SignInForm = () => {
           )}
         />
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? "Loading..." : "Login"}
+          {isPending ? (
+            <div className="flex flex-row items-center justify-center">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </div>
+          ) : (
+            "Submit"
+          )}
         </Button>
       </form>
     </Form>

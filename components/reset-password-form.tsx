@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { resetPassword } from "@/lib/actions";
 import { useFormState } from "react-dom";
+import { Loader2 } from "lucide-react";
 
 const initialState = {
   success: false,
@@ -96,7 +97,14 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
           )}
         />
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? "Sending..." : "Send"}
+          {isPending ? (
+            <div className="flex flex-row items-center justify-center">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </div>
+          ) : (
+            "Submit"
+          )}
         </Button>
       </form>
     </Form>
