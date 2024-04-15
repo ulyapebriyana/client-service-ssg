@@ -1,7 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import React from "react";
 
-const Thankyou = () => {
+const Loading = () => {
   return (
     <div className="container py-6">
       <div className="grid gap-4">
@@ -20,4 +19,4 @@ const Thankyou = () => {
   );
 };
 
-export default Thankyou;
+export default Loading;
