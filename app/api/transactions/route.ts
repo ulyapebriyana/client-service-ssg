@@ -16,12 +16,15 @@ export async function GET(req: NextRequest) {
             take: pageSize,
             include: {
                 user: true
+            },
+            orderBy: {
+                createdAt: "desc"
             }
         });
 
         const transactionsData = transactions.map(transaction => ({
             ...transaction,
-            price: transaction.price.toString() 
+            price: transaction.price.toString()
         }));
 
 

@@ -6,7 +6,7 @@ export async function POST(req: Request, res: Response) {
         const { telegramId } = await req.json()
 
         const group_id = process.env.TELEGRAM_GROUP_ID as string
-        const expiredDate = Math.floor(Date.now() / 1000) + (1 * 60);
+        const expiredDate = Math.floor(Date.now() / 1000) + (24 * 60 * 60);
         const memberLimit = 1
         const createInvitation = await bot.telegram.createChatInviteLink(group_id, {
             expire_date: expiredDate,
